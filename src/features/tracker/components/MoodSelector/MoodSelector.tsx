@@ -60,6 +60,7 @@ export default function MoodSelector({
           <div className="flex flex-col gap-2 mt-5">
             <Label htmlFor="about-text-area">Add a note (optional)</Label>
             <Textarea
+              className="max-w-sm"
               value={note}
               onChange={(e) => setNote(e.target.value)}
               id="about-text-area"
