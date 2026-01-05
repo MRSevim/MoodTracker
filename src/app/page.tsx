@@ -13,14 +13,14 @@ export default async function Home() {
         </h2>
         <Button
           asChild
-          className="py-6 px-10 text-lg rounded-xl transition-transform transition-shadow duration-300 hover:scale-105 hover:shadow-xl"
+          className="py-6 px-10 text-lg rounded-xl transition-shadow duration-300 hover:scale-105 hover:shadow-xl"
         >
           <Link href={routes.signIn}>Start Tracking</Link>
         </Button>
       </div>
 
       {/* Right side video */}
-      <div className="rounded-2xl overflow-hidden shadow-xl border border-foreground border-2 shrink h-auto sm:flex-2">
+      <div className="rounded-2xl overflow-hidden shadow-xl border-foreground border-2 shrink h-auto sm:flex-2">
         <video
           src="/MoodTracker.webm"
           autoPlay

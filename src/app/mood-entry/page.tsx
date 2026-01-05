@@ -23,7 +23,7 @@ export default async function Home({
     }
     if (editing) {
       if (!entry || error) {
-        throw error || "Could not get today's mood";
+        throw Error(error || "Could not get today's mood");
       }
       editedEntry = {
         valence: entry.valence,
@@ -34,7 +34,7 @@ export default async function Home({
   }
 
   return (
-    <Container className="flex-1 flex flex-col justify-center items-center">
+    <Container>
       <MoodSelector editedEntry={editedEntry} />
     </Container>
   );

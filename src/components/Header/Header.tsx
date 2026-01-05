@@ -1,5 +1,4 @@
 import Link from "next/link";
-
 import Container from "../Container";
 import { Suspense } from "react";
 import UserMenu from "./UserMenu";
@@ -10,7 +9,7 @@ export default function Header() {
   return (
     <header className="border-b">
       <Container>
-        <div className="flex flex-col p-4 items-center justify-between sm:flex-row">
+        <div className="flex p-4 items-center justify-between">
           {/* Left */}
           <div className="text-2xl font-bold mb-2 sm:mb-0">
             <Link href={routes.homepage} className="cursor-pointer">

@@ -59,7 +59,7 @@ const Calendar = async ({ searchParams }: DashboardSearchParams) => {
 
   return (
     <Card className="w-full">
-      <CardHeader className="flex items-center gap-2 flex flex-col">
+      <CardHeader className="flex items-center gap-2 flex-col">
         <CalendarDays className="h-5 w-5 text-muted-foreground" />
         <CardTitle>Mood Calendar</CardTitle>
         <DatePicker
@@ -114,7 +114,7 @@ const Calendar = async ({ searchParams }: DashboardSearchParams) => {
 export const CalendarSkeleton = () => {
   return (
     <Card className="w-full">
-      <CardHeader className="flex items-center gap-2 flex flex-col">
+      <CardHeader className="flex items-center gap-2 flex-col">
         <CalendarDays className="h-5 w-5 text-muted-foreground" />
         <CardTitle>Mood Calendar</CardTitle>
         <DatePickerSkeleton />
