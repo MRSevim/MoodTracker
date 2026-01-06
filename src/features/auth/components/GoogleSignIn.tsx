@@ -4,8 +4,8 @@ import { FcGoogle } from "react-icons/fc";
 import { routes } from "@/utils/config";
 
 export default function GoogleSignIn() {
-  /* const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  console.log(timezone); */
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  console.log(timezone);
   return (
     <form
       action={async () => {
