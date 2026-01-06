@@ -1,6 +1,21 @@
 import { auth } from "@/features/auth/lib/auth";
+import { routes } from "@/utils/config";
+import { NextResponse } from "next/server";
 
-export { auth as middleware };
+const authenticatedRoutes = [routes.dashboard, routes.settings];
+
+export default auth((request) => {
+  const requiresAuth = authenticatedRoutes.some((route) =>
+    request.nextUrl.pathname.startsWith(route)
+  );
+  if (!request.auth && requiresAuth) {
+    return NextResponse.redirect(new URL(routes.signIn, request.url));
+  }
+
+  if (request.auth && request.nextUrl.pathname.startsWith(routes.signIn)) {
+    return NextResponse.redirect(new URL(routes.dashboard, request.url));
+  }
+});
 
 export const config = {
   matcher: [

@@ -3,8 +3,6 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import NextAuth, { type DefaultSession } from "next-auth";
 import Google from "next-auth/providers/google";
 import "next-auth/jwt";
-import { routes } from "@/utils/config";
-import { NextResponse } from "next/server";
 
 declare module "next-auth" {
   /**
@@ -31,7 +29,6 @@ declare module "next-auth/jwt" {
     id: string;
   }
 }
-const authenticatedRoutes = [routes.dashboard, routes.settings];
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),
@@ -49,18 +46,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       //  adds id to user of session
       session.user.id = token.id;
       return session;
-    },
-    authorized: async ({ request, auth }) => {
-      const requiresAuth = authenticatedRoutes.some((route) =>
-        request.nextUrl.pathname.startsWith(route)
-      );
-      if (!auth && requiresAuth) {
-        return NextResponse.redirect(new URL(routes.signIn, request.url));
-      }
-
-      if (auth && request.nextUrl.pathname.startsWith(routes.signIn)) {
-        return NextResponse.redirect(new URL(routes.dashboard, request.url));
-      }
     },
     async signIn({ user }) {
       console.log(user);
