@@ -4,7 +4,7 @@ import { Lock } from "lucide-react"; // optional icon
 
 export default function SignInCard() {
   return (
-    <Card className="max-w-md mx-auto mb-30">
+    <Card className="max-w-md mx-auto my-30">
       <CardContent className="flex flex-col items-center gap-4">
         {/* Google Sign-In */}
         <div className="mb-4 w-full">

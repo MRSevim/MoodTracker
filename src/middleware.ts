@@ -28,4 +28,5 @@ export const config = {
      */
     "/((?!api|_next/static|_next/image|favicon.ico).*)",
   ],
+  runtime: "nodejs", // Specify the runtime environment as Node.js
 };
