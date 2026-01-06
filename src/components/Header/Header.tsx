@@ -3,7 +3,7 @@ import Container from "../Container";
 import { Suspense } from "react";
 import UserMenu from "./UserMenu";
 import { Skeleton } from "../shadcn/skeleton";
-import { routes } from "@/utils/config";
+import { routes } from "@/utils/routes";
 
 export default function Header() {
   return (

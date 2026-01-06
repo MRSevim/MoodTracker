@@ -8,7 +8,7 @@ import {
 import { Edit3, PlusCircle } from "lucide-react";
 import { getColor } from "../../utils/helpers";
 import Link from "next/link";
-import { routes } from "@/utils/config";
+import { routes } from "@/utils/routes";
 import { getTodaysMood } from "../../lib/database";
 import ErrorMessage from "@/components/ErrorMessage";
 import { Skeleton } from "@/components/shadcn/skeleton";

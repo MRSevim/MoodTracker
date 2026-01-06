@@ -1,55 +1,48 @@
+import "server-only";
 import { prisma } from "@/lib/prisma";
-import { PrismaAdapter } from "@auth/prisma-adapter";
-import NextAuth, { type DefaultSession } from "next-auth";
-import Google from "next-auth/providers/google";
-import "next-auth/jwt";
+import { env } from "@/utils/config";
+import { betterAuth } from "better-auth";
+import { prismaAdapter } from "better-auth/adapters/prisma";
+import { nextCookies } from "better-auth/next-js";
+import { APIError } from "better-auth/api";
+import { getOAuthState } from "better-auth/api";
 
-declare module "next-auth" {
-  /**
-   * Returned by `auth`, `useSession`, `getSession` and received as a prop on the `SessionProvider` React Context
-   */
-  interface Session {
+export const auth = betterAuth({
+  database: prismaAdapter(prisma, {
+    provider: "postgresql",
+  }),
+  socialProviders: {
+    google: {
+      clientId: env.AUTH_GOOGLE_ID,
+      clientSecret: env.AUTH_GOOGLE_SECRET,
+    },
+  },
+  plugins: [nextCookies()], // make sure nextCookies is the last plugin in the array, it is to set cookies correctly on authentications
+  databaseHooks: {
     user: {
-      /** The user's id. */
-      id: string;
-      /**
-       * By default, TypeScript merges new interface properties and overwrites existing ones.
-       * In this case, the default session user properties will be overwritten,
-       * with the new ones defined above. To keep the default session user properties,
-       * you need to add them back into the newly declared interface.
-       */
-    } & DefaultSession["user"];
-  }
-}
+      create: {
+        before: async (user) => {
+          const state = await getOAuthState();
+          const timezone = state?.timezone;
 
-declare module "next-auth/jwt" {
-  /** Returned by the `jwt` callback and `auth`, when using JWT sessions */
-  interface JWT {
-    /** extend with id */
-    id: string;
-  }
-}
+          if (!timezone) {
+            throw new APIError("BAD_REQUEST", {
+              message: "You must have a timezone in the query params.",
+            });
+          }
 
-export const { handlers, signIn, signOut, auth } = NextAuth({
-  adapter: PrismaAdapter(prisma),
-  providers: [Google],
-  session: { strategy: "jwt" },
-  callbacks: {
-    jwt({ token, user }) {
-      if (user && user.id) {
-        // User is available during sign-in
-        token.id = user.id;
-      }
-      return token;
+          // Modify user data before creation
+          return { data: { ...user, timezone } };
+        },
+      },
     },
-    session({ session, token }) {
-      //  adds id to user of session
-      session.user.id = token.id;
-      return session;
-    },
-    async signIn({ user }) {
-      console.log(user);
-      return true;
+  },
+  user: {
+    additionalFields: {
+      timezone: {
+        type: "string",
+        required: true,
+      },
     },
   },
 });

@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { checkAuth, returnErrorFromUnknown } from "@/utils/helpers";
 import { AddMood } from "../utils/types";
 import { getIsoDate, getStartAndEndOfToday } from "../utils/helpers";
-import { routes } from "@/utils/config";
+import { routes } from "@/utils/routes";
 import { getInsights } from "../utils/MoodInsight-utils";
 
 //adds mood with current date or update if already exists

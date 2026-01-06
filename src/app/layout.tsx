@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, JetBrains_Mono, Source_Serif_4 } from "next/font/google";
 import "./globals.css";
-import ClientWrapper from "@/lib/ClientWrapper";
 import Header from "@/components/Header/Header";
 
 const geistSans = Geist({
@@ -36,7 +35,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${sourceSerif4.variable} ${jetBrainsMono.variable} antialiased flex flex-col min-h-screen`}
       >
         <Header />
-        <ClientWrapper>{children}</ClientWrapper>
+        {children}
       </body>
     </html>
   );

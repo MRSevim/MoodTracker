@@ -1,21 +1,23 @@
-import { auth } from "@/features/auth/lib/auth";
-import { routes } from "@/utils/config";
-import { NextResponse } from "next/server";
+import { routes } from "./utils/routes";
+import { NextRequest, NextResponse } from "next/server";
+import { getSessionCookie } from "better-auth/cookies";
 
 const authenticatedRoutes = [routes.dashboard, routes.settings];
 
-export default auth((request) => {
+export const middleware = async (request: NextRequest) => {
   const requiresAuth = authenticatedRoutes.some((route) =>
     request.nextUrl.pathname.startsWith(route)
   );
-  if (!request.auth && requiresAuth) {
+  const sessionCookie = getSessionCookie(request);
+
+  if (!sessionCookie && requiresAuth) {
     return NextResponse.redirect(new URL(routes.signIn, request.url));
   }
 
-  if (request.auth && request.nextUrl.pathname.startsWith(routes.signIn)) {
+  if (sessionCookie && request.nextUrl.pathname.startsWith(routes.signIn)) {
     return NextResponse.redirect(new URL(routes.dashboard, request.url));
   }
-});
+};
 
 export const config = {
   matcher: [
@@ -28,5 +30,4 @@ export const config = {
      */
     "/((?!api|_next/static|_next/image|favicon.ico).*)",
   ],
-  runtime: "nodejs", // Specify the runtime environment as Node.js
 };

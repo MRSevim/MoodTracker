@@ -2,7 +2,8 @@ import Container from "@/components/Container";
 import { auth } from "@/features/auth/lib/auth";
 import MoodSelector from "@/features/tracker/components/MoodSelector/MoodSelector";
 import { getTodaysMood } from "@/features/tracker/lib/database";
-import { routes } from "@/utils/config";
+import { routes } from "@/utils/routes";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 export default async function Home({
@@ -10,7 +11,9 @@ export default async function Home({
 }: {
   searchParams: Promise<{ edit?: string }>;
 }) {
-  const session = await auth();
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
   const user = session?.user;
   const { edit } = await searchParams;
   let editedEntry;

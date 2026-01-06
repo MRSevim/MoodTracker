@@ -1,6 +1,6 @@
 import Container from "@/components/Container";
 import { Button } from "@/components/shadcn/button";
-import { routes } from "@/utils/config";
+import { routes } from "@/utils/routes";
 import Link from "next/link";
 
 export default async function Home() {

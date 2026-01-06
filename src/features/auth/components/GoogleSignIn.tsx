@@ -1,16 +1,21 @@
+"use client";
 import { Button } from "@/components/shadcn/button";
-import { signIn } from "../lib/auth";
 import { FcGoogle } from "react-icons/fc";
-import { routes } from "@/utils/config";
+import { authClient } from "../lib/authClient";
+import { routes } from "@/utils/routes";
 
 export default function GoogleSignIn() {
-  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  console.log(timezone);
   return (
     <form
-      action={async () => {
-        "use server";
-        await signIn("google", { redirectTo: routes.dashboard });
+      onSubmit={async (e) => {
+        e.preventDefault();
+        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+        await authClient.signIn.social({
+          provider: "google",
+          callbackURL: routes.dashboard,
+          additionalData: { timezone },
+        });
       }}
     >
       <Button

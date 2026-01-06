@@ -13,13 +13,16 @@ import {
   AvatarImage,
 } from "@/components/shadcn/avatar";
 import Link from "next/link";
-import { auth, signOut } from "@/features/auth/lib/auth";
-import { routes } from "@/utils/config";
+import { routes } from "@/utils/routes";
+import { auth } from "@/features/auth/lib/auth";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
 const UserMenu = async () => {
-  const session = await auth();
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
   const user = session?.user;
-
   return (
     <>
       {user ? (
@@ -50,7 +53,12 @@ const UserMenu = async () => {
               <Button
                 onClick={async () => {
                   "use server";
-                  await signOut();
+                  const { success } = await auth.api.signOut({
+                    headers: await headers(),
+                  });
+                  if (success) {
+                    redirect(routes.homepage);
+                  }
                 }}
               >
                 Sign out
