@@ -4,9 +4,10 @@ import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { checkAuth, returnErrorFromUnknown } from "@/utils/helpers";
 import { AddMood } from "../utils/types";
-import { getIsoDate, getStartAndEndOfToday } from "../utils/helpers";
+import { checkDateTimeValidity, getStartAndEndOfToday } from "../utils/helpers";
 import { routes } from "@/utils/routes";
 import { getInsights } from "../utils/MoodInsight-utils";
+import { DateTime } from "luxon";
 
 //adds mood with current date or update if already exists
 export const addMood = async (entry: AddMood) => {
@@ -25,7 +26,7 @@ export const addMood = async (entry: AddMood) => {
     )
       throw Error("Valence and arousal must be whole numbers between -5 and 5");
 
-    const { gte, lte } = getStartAndEndOfToday();
+    const { gte, lte } = getStartAndEndOfToday(user.timezone);
 
     const existing = await prisma.moodEntry.findFirst({
       where: {
@@ -70,7 +71,7 @@ export const getTodaysMood = async () => {
   try {
     const user = await checkAuth();
 
-    const { gte, lte } = getStartAndEndOfToday();
+    const { gte, lte } = getStartAndEndOfToday(user.timezone);
 
     const entry = await prisma.moodEntry.findFirst({
       where: {
@@ -79,9 +80,6 @@ export const getTodaysMood = async () => {
           gte,
           lte,
         },
-      },
-      orderBy: {
-        day: "asc",
       },
     });
 
@@ -98,29 +96,79 @@ export const getMoodsByMonth = async (param: {
 }) => {
   try {
     const user = await checkAuth();
-    const now = new Date();
+    const timezone = user.timezone;
+    const now = DateTime.now().setZone(timezone);
+    checkDateTimeValidity(now);
 
-    const year = param?.year || now.getFullYear();
+    const year = param?.year || now.year;
     const month =
       param?.month !== undefined && !isNaN(param?.month)
         ? param.month
-        : now.getMonth(); // 0-indexed: Jan = 0
+        : now.month; // 1-indexed: Jan = 1
 
-    const gte = new Date(year, month, 1, 0, 0, 0, 0);
-    const lte = new Date(year, month + 1, 0, 23, 59, 59, 999);
+    const gte = DateTime.fromObject(
+      {
+        year,
+        month,
+      },
+      { zone: timezone }
+    )
+      .startOf("month")
+      .toJSDate();
+    const lte = DateTime.fromObject(
+      {
+        year,
+        month,
+      },
+      { zone: timezone }
+    )
+      .endOf("month")
+      .toJSDate();
 
     // fetch entries for that month
-    const entries = await prisma.moodEntry.findMany({
-      where: {
-        userId: user.id,
-        day: {
-          gte,
-          lte,
+    const entries = (
+      await prisma.moodEntry.findMany({
+        where: {
+          userId: user.id,
+          day: {
+            gte,
+            lte,
+          },
         },
-      },
-      orderBy: {
-        day: "asc",
-      },
+        orderBy: {
+          day: "asc",
+        },
+      })
+    ).map((e) => {
+      const day = DateTime.fromJSDate(e.day, { zone: timezone });
+      checkDateTimeValidity(day);
+      return { ...e, day };
+    });
+
+    const today = DateTime.now().setZone(timezone).startOf("day"); // normalize today to 00:00:00
+    const lastDay = DateTime.now().setZone(timezone).endOf("month");
+    const monthStart = DateTime.now().setZone(timezone).startOf("month");
+    checkDateTimeValidity(today);
+    checkDateTimeValidity(lastDay);
+    checkDateTimeValidity(monthStart);
+
+    // create full month array
+    const calendarDays = Array.from({ length: lastDay.day }, (_, i) => {
+      const day = monthStart.plus({ days: i }).startOf("day");
+      checkDateTimeValidity(day);
+
+      // find matching entry
+      const entry = entries.find((e) => {
+        const entryDate = e.day.startOf("day");
+
+        return entryDate.equals(day);
+      });
+
+      return {
+        day,
+        entry,
+        isFuture: day > today,
+      };
     });
 
     // scan all recorded months/years for frontend selection
@@ -132,13 +180,14 @@ export const getMoodsByMonth = async (param: {
     // create a Set of unique "year-month" strings
     const availableTimesSet = new Set(
       allEntries.map((e) => {
-        const date = new Date(e.day.getTime());
-        return `${date.getFullYear()}-${date.getMonth()}`;
+        const date = DateTime.fromJSDate(e.day, { zone: timezone });
+        checkDateTimeValidity(date);
+        return `${date.year}-${date.month}`;
       })
     );
 
     // add current month/year to the Set
-    availableTimesSet.add(`${now.getFullYear()}-${now.getMonth()}`);
+    availableTimesSet.add(`${now.year}-${now.month}`);
 
     const availableTimes = Array.from(availableTimesSet).map((s) => {
       const [y, m] = s.split("-").map(Number);
@@ -147,7 +196,7 @@ export const getMoodsByMonth = async (param: {
 
     return {
       data: {
-        entries,
+        calendarDays,
         availableTimes,
         month,
         year,
@@ -163,21 +212,31 @@ export const getMoodsByMonth = async (param: {
 export const getMoodEntriesByDays = async (days: number = 90) => {
   try {
     const user = await checkAuth();
-    const now = new Date();
+    const timezone = user.timezone;
+    const now = DateTime.now().setZone(timezone);
+    checkDateTimeValidity(now);
 
-    const gte = new Date();
-    gte.setDate(now.getDate() - (days - 1)); // inclusive
+    const gte = now.minus({ days: days - 1 }); // inclusive
 
     const entries = await prisma.moodEntry.findMany({
       where: {
         userId: user.id,
         day: {
-          gte,
-          lte: now,
+          gte: gte.toJSDate(),
+          lte: now.toJSDate(),
         },
       },
       orderBy: { day: "asc" },
     });
+
+    //converts to iso date
+    const getIsoDate = (date: Date) => {
+      const dt = DateTime.fromJSDate(date, { zone: timezone });
+
+      checkDateTimeValidity(dt);
+
+      return dt.toISODate(); // string
+    };
 
     // map entries to a dictionary for quick lookup
     const entryMap = new Map(
@@ -189,12 +248,11 @@ export const getMoodEntriesByDays = async (days: number = 90) => {
 
     // generate full days array
     const chartData = Array.from({ length: days }, (_, i) => {
-      const d = new Date(gte);
-      d.setDate(gte.getDate() + i);
-      const day = getIsoDate(d);
+      const d = gte.plus({ days: i });
+      const day = getIsoDate(d.toJSDate());
 
       return {
-        day: d,
+        day: d.toLocaleString(DateTime.DATE_FULL),
         ...entryMap.get(day),
       };
     });
@@ -209,17 +267,18 @@ export const getMoodEntriesByDays = async (days: number = 90) => {
 export const getInsightsByDays = async (days: number = 90) => {
   try {
     const user = await checkAuth();
-    const now = new Date();
+    const timezone = user.timezone;
+    const now = DateTime.now().setZone(timezone);
+    checkDateTimeValidity(now);
 
-    const gte = new Date();
-    gte.setDate(now.getDate() - (days - 1)); // inclusive
+    const gte = now.minus({ days: days - 1 }); // inclusive
 
     const entries = await prisma.moodEntry.findMany({
       where: {
         userId: user.id,
         day: {
-          gte,
-          lte: now,
+          gte: gte.toJSDate(),
+          lte: now.toJSDate(),
         },
       },
       orderBy: { day: "asc" },
@@ -237,7 +296,7 @@ export const getInsightsByDays = async (days: number = 90) => {
       };
     }
 
-    const insights = getInsights(entries);
+    const insights = getInsights(entries, timezone);
 
     return { insights, error: "" };
   } catch (error) {

@@ -1,3 +1,6 @@
+import { DateTime } from "luxon";
+import { checkDateTimeValidity } from "./helpers";
+
 //Maps valence (-5 to 5) and arousal (-5 to 5) into a human-readable mood.
 export function getMoodFromValenceArousal(
   valence: number,
@@ -27,7 +30,8 @@ export function getMoodFromValenceArousal(
 }
 
 export function getInsights(
-  entries: { day: Date; valence: number; arousal: number }[]
+  entries: { day: Date; valence: number; arousal: number }[],
+  timezone: string
 ) {
   // Helper to get majority (returns null if tie)
   const getMajority = (arr: string[]) => {
@@ -58,13 +62,19 @@ export function getInsights(
     getMoodFromValenceArousal(e.valence, e.arousal)
   );
 
+  const luxonEntries = entries.map((e) => {
+    const dt = DateTime.fromJSDate(e.day, { zone: timezone });
+    checkDateTimeValidity(dt);
+    return { ...e, day: dt };
+  });
+
   // Separate weekdays and weekends
-  const weekdays = entries
-    .filter((e) => [1, 2, 3, 4, 5].includes(e.day.getDay()))
+  const weekdays = luxonEntries
+    .filter((e) => [1, 2, 3, 4, 5].includes(e.day.weekday))
     .map((e) => getMoodFromValenceArousal(e.valence, e.arousal));
 
-  const weekends = entries
-    .filter((e) => [0, 6].includes(e.day.getDay()))
+  const weekends = luxonEntries
+    .filter((e) => [6, 7].includes(e.day.weekday))
     .map((e) => getMoodFromValenceArousal(e.valence, e.arousal));
 
   // Most common moods

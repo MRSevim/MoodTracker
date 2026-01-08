@@ -1,3 +1,5 @@
+import { DateTime } from "luxon";
+
 export type AvailableTimes = YearAndMonth[];
 
 export type DatePickerProps = {
@@ -29,7 +31,8 @@ export const getAvailableMonthsByYear = (
   // convert to nice month names using the actual year
   const convertedMonths = sortedMonths.map((m) => {
     return {
-      string: new Date(year, m).toLocaleString("en-US", { month: "long" }),
+      string: DateTime.fromObject({ year, month: m }, { locale: "en-US" })
+        .monthLong,
       monthNumber: m,
     };
   });

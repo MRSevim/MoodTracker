@@ -44,7 +44,7 @@ function Chart({
   data,
 }: {
   data: {
-    day: Date;
+    day: string;
     valence?: number;
     arousal?: number;
   }[];
@@ -52,9 +52,6 @@ function Chart({
   const [timeRange, setTimeRange] = React.useState("7");
   const filteredData = data.slice(-timeRange);
 
-  const formatDate = (value: Date) => {
-    return new Date(value).toDateString();
-  };
   return (
     <Card className="flex-2 w-full">
       <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 md:flex-row">
@@ -86,7 +83,7 @@ function Chart({
       <CardContent>
         <ChartContainer
           config={chartConfig}
-          className="aspect-auto h-[250px] w-full"
+          className="aspect-auto h-62.5 w-full"
         >
           <AreaChart data={filteredData}>
             <defs>
@@ -122,7 +119,6 @@ function Chart({
               axisLine={false}
               tickMargin={8}
               minTickGap={32}
-              tickFormatter={formatDate}
             />
             <YAxis
               type="number"
@@ -134,12 +130,7 @@ function Chart({
             />
             <ChartTooltip
               cursor={false}
-              content={
-                <ChartTooltipContent
-                  labelFormatter={formatDate}
-                  indicator="dot"
-                />
-              }
+              content={<ChartTooltipContent indicator="dot" />}
             />
             <Area
               dataKey="valence"
@@ -175,7 +166,7 @@ export const ChartSkeleton = () => {
       </CardHeader>
       <CardContent>
         {/* Chart placeholder */}
-        <div className="aspect-auto w-full h-[250px] rounded-md">
+        <div className="aspect-auto w-full h-62.5 rounded-md">
           <Skeleton className="h-full w-full" />
         </div>
 

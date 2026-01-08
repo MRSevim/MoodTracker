@@ -97,7 +97,7 @@ const SelectorGrid = memo(function Memoized({
     <>
       {/* 2D Selector */}
       <div className="flex flex-col items-center justify-center">
-        <div className="relative min-w-[225px] xs:min-w-[300px] sm:min-w-[350px] md:min-w-[400px] aspect-square border rounded-md bg-muted">
+        <div className="relative min-w-56.25 xs:min-w-75 sm:min-w-87.5 md:min-w-100 aspect-square border rounded-md bg-muted">
           <Tooltips />
 
           {/* Grid */}

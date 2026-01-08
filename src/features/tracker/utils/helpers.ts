@@ -1,3 +1,5 @@
+import { DateTime } from "luxon";
+
 // helper to get color based on x,y
 export const getColor = (x: number, y: number) => {
   const valence = (x + 5) / 10; // 0-1 (unpleasant → pleasant)
@@ -11,19 +13,24 @@ export const getColor = (x: number, y: number) => {
   return `rgb(${r}, ${g}, ${b})`;
 };
 
-//converts to iso date
-export const getIsoDate = (date: Date) =>
-  new Date(date).toISOString().slice(0, 10); //"YYYY-MM-DD";
-
 //gets start and end of day respecting locality
-export const getStartAndEndOfToday = () => {
-  const now = new Date();
+export const getStartAndEndOfToday = (timezone: string) => {
+  const now = DateTime.now().setZone(timezone);
+  checkDateTimeValidity(now);
+  const gte = now.startOf("day").toJSDate();
 
-  const gte = new Date(now);
-  gte.setHours(0, 0, 0, 0);
-
-  const lte = new Date(now);
-  lte.setHours(23, 59, 59, 999);
+  const lte = now.endOf("day").toJSDate();
 
   return { gte, lte };
 };
+
+//Helper func to check luxon dates' validity
+export function checkDateTimeValidity(
+  dt: DateTime<true> | DateTime<false>
+): asserts dt is DateTime<true> {
+  if (!dt.isValid) {
+    throw Error(
+      dt.invalidExplanation || "Luxon date is invalid without explanation"
+    );
+  }
+}

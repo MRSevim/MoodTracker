@@ -1,9 +1,9 @@
 import { auth } from "@/features/auth/lib/auth";
 import { headers } from "next/headers";
 
-//Helper funt to return error messages compitable with ts
+//Helper funt to return error messages
 export const returnErrorFromUnknown = (error: unknown) => {
-  if (error instanceof Error) return { error: error.message };
+  if (error instanceof Error && error.message) return { error: error.message };
   if (typeof error === "string" && error) return { error };
   return { error: "Unknown Error Occurred!" };
 };

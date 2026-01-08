@@ -166,8 +166,8 @@ export function DatePickerSkeleton() {
         <Skeleton className="h-8 w-10 rounded-md" /> {/* Next */}
       </div>
       <div className="flex gap-2 items-center justify-center">
-        <Skeleton className="h-8 w-[85px] rounded-md" /> {/* Month */}
-        <Skeleton className="h-8 w-[85px] rounded-md" /> {/* Year */}
+        <Skeleton className="h-8 w-21.25 rounded-md" /> {/* Month */}
+        <Skeleton className="h-8 w-21.25 rounded-md" /> {/* Year */}
       </div>
     </div>
   );

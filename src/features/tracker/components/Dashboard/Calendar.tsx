@@ -18,6 +18,7 @@ import { getMoodsByMonth } from "../../lib/database";
 import ErrorMessage from "@/components/ErrorMessage";
 import DatePicker, { DatePickerSkeleton } from "./DatePicker";
 import { DashboardSearchParams } from "../../utils/types";
+import { DateTime } from "luxon";
 
 const Calendar = async ({ searchParams }: DashboardSearchParams) => {
   const params = await searchParams;
@@ -29,33 +30,6 @@ const Calendar = async ({ searchParams }: DashboardSearchParams) => {
   if (!data || error) {
     return <ErrorMessage error={error || "Could not fetch the calendar"} />;
   }
-
-  const dataYear = data.year;
-  const dataMonth = data.month;
-
-  const today = new Date();
-  today.setHours(0, 0, 0, 0); // normalize today to 00:00:00
-
-  const lastDay = new Date(dataYear, dataMonth + 1, 0);
-
-  // create full month array
-  const calendarDays = Array.from({ length: lastDay.getDate() }, (_, i) => {
-    const day = new Date(dataYear, dataMonth, i + 1);
-    day.setHours(0, 0, 0, 0); // normalize each day too
-
-    // find matching entry
-    const entry = data.entries.find((e) => {
-      const entryDate = new Date(e.day);
-      entryDate.setHours(0, 0, 0, 0);
-      return entryDate.getTime() === day.getTime();
-    });
-
-    return {
-      day,
-      entry,
-      isFuture: day > today,
-    };
-  });
 
   return (
     <Card className="w-full">
@@ -74,8 +48,8 @@ const Calendar = async ({ searchParams }: DashboardSearchParams) => {
         {" "}
         <div className="grid grid-cols-7 gap-2">
           <TooltipProvider>
-            {calendarDays.map((day) => (
-              <Tooltip key={day.day.getTime()}>
+            {data.calendarDays.map((day) => (
+              <Tooltip key={day.day.toMillis()}>
                 <TooltipTrigger asChild>
                   <div
                     className="w-6 h-6 sm:w-8 sm:h-8 rounded-md cursor-pointer border"
@@ -88,9 +62,9 @@ const Calendar = async ({ searchParams }: DashboardSearchParams) => {
                     }}
                   />
                 </TooltipTrigger>
-                <TooltipContent className="text-wrap text-center max-w-[200px]">
+                <TooltipContent className="text-wrap text-center max-w-50">
                   <p className="text-sm font-medium">
-                    {day.day.toDateString()}
+                    {day.day.toLocaleString(DateTime.DATE_FULL)}
                   </p>
                   {day.entry ? (
                     <p className="text-xs text-muted mt-1">

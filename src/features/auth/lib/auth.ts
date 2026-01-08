@@ -6,6 +6,7 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
 import { APIError } from "better-auth/api";
 import { getOAuthState } from "better-auth/api";
+import { IANAZone } from "luxon";
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
@@ -25,9 +26,9 @@ export const auth = betterAuth({
           const state = await getOAuthState();
           const timezone = state?.timezone;
 
-          if (!timezone) {
+          if (!timezone || !IANAZone.isValidZone(timezone)) {
             throw new APIError("BAD_REQUEST", {
-              message: "You must have a timezone in the query params.",
+              message: "You must have a valid timezone in the query params.",
             });
           }
 
