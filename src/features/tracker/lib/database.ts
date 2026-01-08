@@ -115,6 +115,7 @@ export const getMoodsByMonth = async (param: {
     )
       .startOf("month")
       .toJSDate();
+
     const lte = DateTime.fromObject(
       {
         year,
@@ -146,8 +147,13 @@ export const getMoodsByMonth = async (param: {
     });
 
     const today = DateTime.now().setZone(timezone).startOf("day"); // normalize today to 00:00:00
-    const lastDay = DateTime.now().setZone(timezone).endOf("month");
-    const monthStart = DateTime.now().setZone(timezone).startOf("month");
+    const calendarMonth = DateTime.fromObject(
+      { year, month },
+      { zone: timezone }
+    );
+    const lastDay = calendarMonth.endOf("month");
+    const monthStart = calendarMonth.startOf("month");
+
     checkDateTimeValidity(today);
     checkDateTimeValidity(lastDay);
     checkDateTimeValidity(monthStart);
@@ -156,7 +162,6 @@ export const getMoodsByMonth = async (param: {
     const calendarDays = Array.from({ length: lastDay.day }, (_, i) => {
       const day = monthStart.plus({ days: i }).startOf("day");
       checkDateTimeValidity(day);
-
       // find matching entry
       const entry = entries.find((e) => {
         const entryDate = e.day.startOf("day");
