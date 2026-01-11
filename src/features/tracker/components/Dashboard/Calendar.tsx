@@ -17,14 +17,15 @@ import { Skeleton } from "@/components/shadcn/skeleton";
 import { getMoodsByMonth } from "../../lib/database";
 import ErrorMessage from "@/components/ErrorMessage";
 import DatePicker, { DatePickerSkeleton } from "./DatePicker";
-import { DashboardSearchParams } from "../../utils/types";
 import { DateTime } from "luxon";
 
-const Calendar = async ({ searchParams }: DashboardSearchParams) => {
-  const params = await searchParams;
+const Calendar = async ({
+  params,
+}: {
+  params: { year?: string; month?: string };
+}) => {
   const year = Number(params?.year);
   const month = Number(params?.month);
-
   const { data, error } = await getMoodsByMonth({ year, month });
 
   if (!data || error) {

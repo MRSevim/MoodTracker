@@ -4,18 +4,25 @@ import TodaysEntry, {
   TodaysEntryWrapper,
 } from "./TodaysEntry";
 import Calendar, { CalendarSkeleton } from "./Calendar";
-import { DashboardSearchParams } from "../../utils/types";
 import ChartWrapper from "./Charts/ChartWrapper";
 import { ChartSkeleton } from "./Charts/Chart";
 import Insights, { InsightsSkeleton, InsightsWrapper } from "./Insights";
 
-export default function Dashboard({ searchParams }: DashboardSearchParams) {
+export default async function Dashboard({
+  searchParams,
+}: {
+  searchParams: Promise<{ year?: string; month?: string }>;
+}) {
+  const params = await searchParams;
   return (
     <div className="flex-1 w-full my-10 flex flex-col justify-center items-center md:flex-row gap-8 md:items-start">
       {" "}
       <div className="flex flex-col gap-8 justify-center items-center flex-1 w-full">
-        <Suspense fallback={<CalendarSkeleton />}>
-          <Calendar searchParams={searchParams} />
+        <Suspense
+          key={params.year || "" + params.month}
+          fallback={<CalendarSkeleton />}
+        >
+          <Calendar params={params} />
         </Suspense>
 
         <TodaysEntryWrapper>

@@ -1,5 +1,4 @@
 "use client";
-
 import { Button } from "@/components/shadcn/button";
 import {
   Select,
@@ -11,7 +10,7 @@ import {
 import { Skeleton } from "@/components/shadcn/skeleton";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   callReplace,
   DatePickerProps,
@@ -25,56 +24,37 @@ function DatePicker({ data }: DatePickerProps) {
   const { replace } = useRouter();
   const [month, setMonth] = useState(data.month);
   const [year, setYear] = useState(data.year);
-  const [years, setYears] = useState(getAvailableYears(data.availableTimes));
-  const [months, setMonths] = useState(
-    getAvailableMonthsByYear(data.availableTimes, year)
+
+  const { allTimes, currentIndex } = useMemo(
+    () => sortAndGetCurrentIndex(data.availableTimes, { year, month }),
+    [data.availableTimes, year, month]
+  );
+  const years = useMemo(
+    () => getAvailableYears(data.availableTimes),
+    [data.availableTimes]
+  );
+  const months = useMemo(
+    () => getAvailableMonthsByYear(data.availableTimes, year),
+    [data.availableTimes, year]
   );
 
-  useEffect(() => {
-    //to sync the local state with incoming data
-    setMonth(data.month);
-    setYear(data.year);
-    setYears(getAvailableYears(data.availableTimes));
-  }, [data]);
-
-  useEffect(() => {
-    /* Sets the available months when year changes, logic is in useEffect because year can change from
-    both back and forward buttons and year selection*/
-    setMonths(getAvailableMonthsByYear(data.availableTimes, year));
-  }, [data, year]);
-
   const handlePrevMonth = () => {
-    const { allTimes, currentIndex } = sortAndGetCurrentIndex(
-      data.availableTimes,
-      { year, month }
-    );
-
     if (currentIndex > 0) {
       const prev = allTimes[currentIndex - 1];
+      callReplace(replace, pathname, { year: prev.year, month: prev.month });
       setYear(prev.year);
       setMonth(prev.month);
-      callReplace(replace, pathname, { year: prev.year, month: prev.month });
     }
   };
 
   const handleNextMonth = () => {
-    const { allTimes, currentIndex } = sortAndGetCurrentIndex(
-      data.availableTimes,
-      { year, month }
-    );
-
     if (currentIndex < allTimes.length - 1) {
       const next = allTimes[currentIndex + 1];
+      callReplace(replace, pathname, { year: next.year, month: next.month });
       setYear(next.year);
       setMonth(next.month);
-      callReplace(replace, pathname, { year: next.year, month: next.month });
     }
   };
-
-  const { allTimes: allTimesSorted, currentIndex } = useMemo(
-    () => sortAndGetCurrentIndex(data.availableTimes, { year, month }),
-    [data.availableTimes, year, month]
-  );
 
   return (
     <div className="flex gap-2 flex-col">
@@ -94,7 +74,7 @@ function DatePicker({ data }: DatePickerProps) {
           variant="outline"
           size="icon"
           onClick={handleNextMonth}
-          disabled={currentIndex >= allTimesSorted.length - 1}
+          disabled={currentIndex >= allTimes.length - 1}
         >
           <ChevronRight className="h-4 w-4" />
           <span className="sr-only">Go forward a month</span>
@@ -136,7 +116,7 @@ function DatePicker({ data }: DatePickerProps) {
             );
 
             setMonth(newMonths[0].monthNumber);
-            return callReplace(replace, pathname, {
+            callReplace(replace, pathname, {
               year: yearNumber,
               month: newMonths[0].monthNumber,
             });
