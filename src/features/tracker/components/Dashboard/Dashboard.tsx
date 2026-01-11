@@ -7,12 +7,11 @@ import Calendar, { CalendarSkeleton } from "./Calendar";
 import ChartWrapper from "./Charts/ChartWrapper";
 import { ChartSkeleton } from "./Charts/Chart";
 import Insights, { InsightsSkeleton, InsightsWrapper } from "./Insights";
+import { DashboardSearchParams } from "../../utils/types";
 
 export default async function Dashboard({
   searchParams,
-}: {
-  searchParams: Promise<{ year?: string; month?: string }>;
-}) {
+}: DashboardSearchParams) {
   const params = await searchParams;
   return (
     <div className="flex-1 w-full my-10 flex flex-col justify-center items-center md:flex-row gap-8 md:items-start">
