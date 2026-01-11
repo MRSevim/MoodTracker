@@ -59,16 +59,6 @@ export const addMood = async (entry: AddMood) => {
           note,
         },
       });
-      await prisma.moodEntry.create({
-        data: {
-          userId: user.id,
-          // 2025-12-31 12:00:00 UTC (midday to avoid edge-case timezone shifts)
-          day: new Date(Date.UTC(2025, 11, 31, 12, 0, 0)),
-          valence,
-          arousal,
-          note,
-        },
-      });
     }
   } catch (error) {
     return returnErrorFromUnknown(error);
