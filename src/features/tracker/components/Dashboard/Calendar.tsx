@@ -4,7 +4,6 @@ import {
   CardTitle,
   CardContent,
 } from "@/components/shadcn/card";
-
 import {
   Tooltip,
   TooltipContent,
@@ -52,7 +51,7 @@ const Calendar = async ({
             {data.calendarDays.map((day) => (
               <Tooltip key={day.day.toMillis()}>
                 <TooltipTrigger asChild>
-                  <div
+                  <button
                     className="w-6 h-6 sm:w-8 sm:h-8 rounded-md cursor-pointer border"
                     style={{
                       backgroundColor: day.entry

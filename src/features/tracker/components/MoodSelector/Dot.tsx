@@ -23,7 +23,7 @@ export const Dot = memo(function Dot({
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <div
+        <button
           onClick={() => setSelected(isSelected ? null : { x, y })}
           className="w-1/5 h-1/5 rounded-full transition-transform cursor-pointer"
           style={{

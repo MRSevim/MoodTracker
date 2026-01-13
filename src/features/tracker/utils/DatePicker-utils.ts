@@ -45,9 +45,10 @@ export const callReplace = (
   pathname: string,
   data: YearAndMonth
 ) => {
-  return replace(
-    `${pathname}?month=${data.month.toString()}&year=${data.year.toString()}`
-  );
+  const params = new URLSearchParams();
+  params.set("month", data.month.toString());
+  params.set("year", data.year.toString());
+  return replace(`${pathname}?${params.toString()}`);
 };
 
 export const sortAndGetCurrentIndex = (

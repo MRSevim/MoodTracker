@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/shadcn/card";
 import GoogleSignIn from "./GoogleSignIn";
-import { Lock } from "lucide-react"; // optional icon
+import { Lock } from "lucide-react";
 
 export default function SignInCard() {
   return (

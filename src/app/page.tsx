@@ -28,6 +28,7 @@ export default async function Home() {
           muted
           controls
           playsInline
+          aria-label="Mood tracker demo video"
           className="w-full rounded-2xl"
         />
       </div>

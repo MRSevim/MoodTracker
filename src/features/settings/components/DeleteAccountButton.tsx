@@ -68,7 +68,6 @@ export default function DeleteAccountButton() {
           />
 
           {/* Error message */}
-          {error && <ErrorMessage error={error} />}
 
           <DialogFooter className="flex justify-end gap-2 mt-6">
             <Button
@@ -81,10 +80,13 @@ export default function DeleteAccountButton() {
             <Button
               variant="destructive"
               disabled={confirmation !== "delete account" || isPending}
+              aria-describedby="accountDeletionError"
             >
               {isPending ? "Deleting..." : "Confirm Delete"}
             </Button>
           </DialogFooter>
+
+          {error && <ErrorMessage error={error} id="accountDeletionError" />}
         </form>
       </DialogContent>
     </Dialog>

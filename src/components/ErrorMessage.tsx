@@ -1,7 +1,11 @@
-const ErrorMessage = ({ error }: { error: string }) => {
+const ErrorMessage = ({ error, id }: { error: string; id?: string }) => {
   return (
-    <div className="bg-red-50 border border-red-200 rounded-md p-3">
-      <div className="text-red-500 text-sm font-medium">{error}</div>
+    <div
+      id={id}
+      className="bg-red-50 border border-red-200 rounded-md p-3"
+      role="alert"
+    >
+      <p className="text-red-500 text-sm font-medium">{error}</p>
     </div>
   );
 };

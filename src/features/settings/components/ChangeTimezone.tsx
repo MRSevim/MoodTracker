@@ -73,9 +73,6 @@ const TimezoneChanger = ({
         </DialogHeader>
 
         <form action={action}>
-          {/* Error message */}
-          {error && <ErrorMessage error={error} />}
-
           <DialogFooter className="flex justify-end gap-2 mt-6">
             <Button
               type="button"
@@ -84,10 +81,12 @@ const TimezoneChanger = ({
             >
               Cancel
             </Button>
-            <Button disabled={isPending}>
+            <Button disabled={isPending} aria-describedby="zoneChangeError">
               {isPending ? "Updating..." : "Update"}
             </Button>
           </DialogFooter>
+          {/* Error message */}
+          {error && <ErrorMessage error={error} id="zoneChangeError" />}
         </form>
       </DialogContent>
     </Dialog>
