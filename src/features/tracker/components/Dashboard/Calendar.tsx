@@ -46,12 +46,15 @@ const Calendar = async ({
       </CardHeader>
       <CardContent>
         {" "}
-        <div className="grid grid-cols-7 gap-2">
+        <div className="grid grid-cols-7 gap-2" role="grid">
           <TooltipProvider>
             {data.calendarDays.map((day) => (
               <Tooltip key={day.day.toMillis()}>
                 <TooltipTrigger asChild>
-                  <button
+                  <div
+                    role="gridcell"
+                    tabIndex={0}
+                    aria-label="Mood entry"
                     className="w-6 h-6 sm:w-8 sm:h-8 rounded-md cursor-pointer border"
                     style={{
                       backgroundColor: day.entry
@@ -68,7 +71,9 @@ const Calendar = async ({
                   </p>
                   {day.entry ? (
                     <p className="text-xs text-muted mt-1">
-                      {day.entry.note || "No note"}
+                      Valence: {day.entry.valence}, Arousal: {day.entry.arousal}
+                      <br />
+                      {`"${day.entry.note}"` || "No note"}
                     </p>
                   ) : day.isFuture ? (
                     <p className="text-xs text-muted mt-1 italic">Future day</p>
