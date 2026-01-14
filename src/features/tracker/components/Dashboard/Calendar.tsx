@@ -46,43 +46,47 @@ const Calendar = async ({
       </CardHeader>
       <CardContent>
         {" "}
-        <div className="grid grid-cols-7 gap-2" role="grid">
+        <div className="grid grid-cols-7 gap-2">
           <TooltipProvider>
-            {data.calendarDays.map((day) => (
-              <Tooltip key={day.day.toMillis()}>
-                <TooltipTrigger asChild>
-                  <div
-                    role="gridcell"
-                    tabIndex={0}
-                    aria-label="Mood entry"
-                    className="w-6 h-6 sm:w-8 sm:h-8 rounded-md cursor-pointer border"
-                    style={{
-                      backgroundColor: day.entry
-                        ? getColor(day.entry.valence, day.entry.arousal)
-                        : day.isFuture
-                        ? "var(--color-muted-foreground)" // dark gray for future
-                        : "var(--color-muted)", // gray for unreported
-                    }}
-                  />
-                </TooltipTrigger>
-                <TooltipContent className="text-wrap text-center max-w-50">
-                  <p className="text-sm font-medium">
-                    {day.day.toLocaleString(DateTime.DATE_FULL)}
-                  </p>
-                  {day.entry ? (
-                    <p className="text-xs text-muted mt-1">
-                      Valence: {day.entry.valence}, Arousal: {day.entry.arousal}
-                      <br />
-                      {`"${day.entry.note}"` || "No note"}
+            {data.calendarDays.map((day) => {
+              return (
+                <Tooltip key={day.day.toMillis()}>
+                  <TooltipTrigger asChild>
+                    <div
+                      tabIndex={0}
+                      aria-label="Mood entry"
+                      className="w-6 h-6 sm:w-8 sm:h-8 rounded-md cursor-pointer border"
+                      style={{
+                        backgroundColor: day.entry
+                          ? getColor(day.entry.valence, day.entry.arousal)
+                          : day.isFuture
+                          ? "var(--color-muted-foreground)" // dark gray for future
+                          : "var(--color-muted)", // gray for unreported
+                      }}
+                    />
+                  </TooltipTrigger>
+                  <TooltipContent className="text-wrap text-center max-w-50">
+                    <p className="text-sm font-medium">
+                      {day.day.toLocaleString(DateTime.DATE_FULL)}
                     </p>
-                  ) : day.isFuture ? (
-                    <p className="text-xs text-muted mt-1 italic">Future day</p>
-                  ) : (
-                    <p className="text-xs text-muted mt-1 italic">No entry</p>
-                  )}
-                </TooltipContent>
-              </Tooltip>
-            ))}
+                    {day.entry ? (
+                      <p className="text-xs text-muted mt-1">
+                        Valence: {day.entry.valence}, Arousal:{" "}
+                        {day.entry.arousal}
+                        <br />
+                        {`"${day.entry.note}"` || "No note"}
+                      </p>
+                    ) : day.isFuture ? (
+                      <p className="text-xs text-muted mt-1 italic">
+                        Future day
+                      </p>
+                    ) : (
+                      <p className="text-xs text-muted mt-1 italic">No entry</p>
+                    )}
+                  </TooltipContent>
+                </Tooltip>
+              );
+            })}
           </TooltipProvider>
         </div>
       </CardContent>
